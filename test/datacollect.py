@@ -1,6 +1,6 @@
 import ugradio
 import snap_spec
-import sdr 
+from ugradio import sdr
 import numpy as np
 import matplotlib.pyplot as plt
 import astropy
@@ -108,4 +108,5 @@ for i in g_lons:
 	
 	np.savez(f'{file}point{count}', data = spec)
 	time.sleep(440)
-# l is longitiude and b is latitude 
+# l is longitiude and b is latitude
+ 
