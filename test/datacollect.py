@@ -26,7 +26,7 @@ ag.set_frequency(lo, 'MHz')
 
 #initialize the sdr object
 sdr0 = ugradio.sdr.SDR(device_index=0, direct = False, center_freq = 327e6, sample_rate = 3.2e6)
-sdr1 = ugradio.sdr.SDR(device_index=1, direct = False, center_freq = 327e6, sample_rate = 3.2e6)
+#sdr1 = ugradio.sdr.SDR(device_index=1, direct = False, center_freq = 327e6, sample_rate = 3.2e6)
 
 #general process maybe
 #convert galactic lingitudes to topocentric coordinates
@@ -107,7 +107,7 @@ for i in np.arange(72):
     print("I do be pointing")
 
     #lets get the data and then make them power specs 
-    data = ugradio.sdr.capture_data([sdr0, sdr1], 1024, 10000)
+    data = sdr0.capture_data(1024, 10000)
 
     first = power(data['sdr0'], lo)
     second = power(data['sdr1'], lo)
@@ -116,5 +116,5 @@ for i in np.arange(72):
     #now lets try to save the data 
 	
     np.savez(f'{file}point{count}', data = spec)
-    time.sleep(440)
+    time.sleep(200)
 # l is longitiude and b is latitude 
