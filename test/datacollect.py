@@ -1,6 +1,6 @@
 import ugradio
 import snap_spec
-import sdr 
+from ugradio import sdr 
 import numpy as np
 import matplotlib.pyplot as plt
 import astropy
