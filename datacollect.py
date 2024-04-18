@@ -78,7 +78,17 @@ dish = ugradio.leusch.LeuschTelescope()
 
 #this is an array of all of the different longitudes in galactic coords
 g_lons = np.arange(-10, 252, 2)
+s_galactics = [SkyCoord(l= i, b=0, frame = 'galactic', unit='deg') for i in g_lons]
+s_topos = [s.transform_to('icrs') for s in s_galactics]
 
+alts = []
+azs =[]
+
+for i in s_topos:
+    alt, az = ugradio.coord.get_altaz(ra = i.ra, dec= i.dec, jd = ugradio.timing.julian_date(), lat = lat, lon = lon, alt = alt)
+    if 15 < alt <85 and 5 < az < 350:
+        alts.append(alt)
+        azs.append(az)
 #now lets try pointing and stuff 
 
 #lets start our list of data values ig
@@ -89,12 +99,8 @@ count = 0
 
 for i in g_lons:
 	count += 1
-	s_galactic = SkyCoord(l= i, b=0, frame = 'galactic', unit='deg')
-   	s_topo = s_galactic.transform_to('icrs')
-    	alt, az = ugradio.get_altaz(ra = s_topo.ra, dec= s_topo.dec, jd = ugradio.julian_date(), lat = lat, lon = lon, alt = alt)
-
     #now we can point the big boi to the given alt az 
-	dish.point(alt, az)
+	dish.point(alts[i], azs[i])
 	print("I do be pointing")
     #lets get the data and then make them power specs 
     	data = ugradio.sdr.capture_data([sdr0, sdr1], 1024, 10000)
