@@ -109,8 +109,8 @@ for i in np.arange(72):
     #lets get the data and then make them power specs 
     data = ugradio.sdr.capture_data([sdr0, sdr1], 1024, 10000)
 
-    first = power(data[sdr0], lo)
-    second = power(data[sdr1], lo)
+    first = power(data['sdr0'], lo)
+    second = power(data['sdr1'], lo)
     spec = np.append(spec, [first, second])
 
     #now lets try to save the data 
