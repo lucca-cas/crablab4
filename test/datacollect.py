@@ -25,8 +25,8 @@ ag = ugradio.agilent.SynthClient()
 ag.set_frequency(lo, 'MHz')
 
 #initialize the sdr object
-sdr0 = ugradio.sdr.SDR(device_index=0, direct = False, center_freq = 1420e6, sample_rate = 3.2e6)
-sdr1 = ugradio.sdr.SDR(device_index=1, direct = False, center_freq = 1420e6, sample_rate = 3.2e6)
+sdr0 = ugradio.sdr.SDR(device_index=0, direct = False, center_freq = 327e6, sample_rate = 3.2e6)
+sdr1 = ugradio.sdr.SDR(device_index=1, direct = False, center_freq = 327e6, sample_rate = 3.2e6)
 
 #general process maybe
 #convert galactic lingitudes to topocentric coordinates
