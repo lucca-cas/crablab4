@@ -88,27 +88,26 @@ for i in np.arange(72):
 	point += 1
 	jd = ugradio.timing.julian_date()
 	alt,az = ugradio.coord.get_altaz(ra = s_topos[i].ra, dec= s_topos[i].dec, jd = jd, lat = lat, lon = lon, alt = alt)
-    	if (15 < alt <85) and (5 < az < 350):
+	if (15 < alt <85) and (5 < az < 350):
         #now we can point the big boi to the given alt az 
-        	dish.point(alt, az)
+		dish.point(alt, az)
 		print("I do be pointing bro")
-        		if Exception:
-				flops.update({point:[alt,az]})
-				print("ur a flop")
+		if Exception:
+			flops.update({point:[alt,az]})
+			print("ur a flop")
 
 
         #lets get the data and then make them power specs 
 		data = ugradio.sdr.capture_data([sdr0, sdr1], 2048, 100)
 
         # check gains maybe 
-
-        	first = power(data[0])
-        	second = power(data[1])
+		first = power(data[0])
+		second = power(data[1])
 
         #now lets try to save the data 
 
-        	np.savez(f'{file}point{point}', pol0 = first, pol1 = second, alt=alt, az=az, date = jd, missed = flops)
+		np.savez(f'{file}point{point}', pol0 = first, pol1 = second, alt=alt, az=az, date = jd, missed = flops)
     	else:
-        	flops.update({point:[alt,az]})
-        	continue   
+		flops.update({point:[alt,az]})
+		continue   
 # l is longitiude and b is latitude 
