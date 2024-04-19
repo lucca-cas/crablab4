@@ -1,6 +1,6 @@
 import ugradio
 import snap_spec
-import sdr 
+from ugradio import sdr 
 import numpy as np
 import matplotlib.pyplot as plt
 import astropy
@@ -21,12 +21,10 @@ lo = float(args.LO)
 #record_time = float(args.record_time)
 
 #set the LO 
-ag = ugradio.agilent.SynthClient() 
-ag.set_frequency(lo)
 
 #initialize the sdr object
-sdr0 = ugradio.sdr.SDR(device_index=0, direct = False, center_freq = 1420e6, sample_rate = 3.2e6)
-sdr1 = ugradio.sdr.SDR(device_index=1, direct = False, center_freq = 1420e6, sample_rate = 3.2e6)
+sdr0 = ugradio.sdr.SDR(device_index=0, direct = False, center_freq = lo, sample_rate = 3.2e6)
+sdr1 = ugradio.sdr.SDR(device_index=1, direct = False, center_freq = lo, sample_rate = 3.2e6)
 
 #general process maybe
 #convert galactic lingitudes to topocentric coordinates
@@ -53,9 +51,9 @@ def shift(signal):
 	
 # -----------------------------------------
 # -----------------------------------------
-freqs = np.fft.fftshift(np.fft.fftfreq(1024, 1/3.2))
+freqs = np.fft.fftshift(np.fft.fftfreq(2048, 1/3.2))
 
-def power(collection_run, LO): 
+def power(collection_run): 
     collection_run = collection_run - np.mean(collection_run)
     
     
@@ -81,36 +79,35 @@ g_lons = np.arange(-10, 252, 2)
 s_galactics = [SkyCoord(l= i, b=0, frame = 'galactic', unit='deg') for i in g_lons]
 s_topos = [s.transform_to('icrs') for s in s_galactics]
 
-alts = []
-azs =[]
-
-for i in s_topos:
-    alt, az = ugradio.coord.get_altaz(ra = i.ra, dec= i.dec, jd = ugradio.timing.julian_date(), lat = lat, lon = lon, alt = alt)
-    if 15 < alt <85 and 5 < az < 350:
-        alts.append(alt)
-        azs.append(az)
 #now lets try pointing and stuff 
 
 #lets start our list of data values ig
-spec = []
+point =0 
+flops = {}
+for i in np.arange(72):
+    point += 1 
+    jd = ugradio.timing.julian_date()
+    alt,az = ugradio.coord.get_altaz(ra = s_topos[i].ra, dec= s_topos[i].dec, jd = jd, lat = lat, lon = lon, alt = alt)
+    if (15 < alt <85) and (5 < az < 350):
+        #now we can point the big boi to the given alt az 
+        dish.point(alt, az)
+        if Exception:
+            flops.append({point:[alt,az]})
+        else:
+            print("I do be pointing")
 
+        #lets get the data and then make them power specs 
+        data = ugradio.sdr.capture_data([sdr0, sdr1], 2048, 10000)
 
-count = 0
+        # check gains maybe 
 
-for i in g_lons:
-	count += 1
-    #now we can point the big boi to the given alt az 
-	dish.point(alts[i], azs[i])
-	print("I do be pointing")
-    #lets get the data and then make them power specs 
-    	data = ugradio.sdr.capture_data([sdr0, sdr1], 1024, 10000)
+        first = power(data[0])
+        second = power(data[1])
 
-    	first = power(data[sdr0], lo)
-    	second = power(data[sdr1], lo)
-	spec = np.append(spec, [first, second])
+        #now lets try to save the data 
 
-    #now lets try to save the data 
-	
-    	np.savez(f'{file}point{count}', data = spec)
-    	time.sleep(440)
+        np.savez(f'{file}point{point}', pol0 = first, pol1 = second, alt=alt, az=az, date = jd, missed = flops)
+    else:
+        flops.update({point:[alt,az]})
+        continue   
 # l is longitiude and b is latitude 
