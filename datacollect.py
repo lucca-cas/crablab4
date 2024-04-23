@@ -106,7 +106,7 @@ try:
 
             #now lets try to save the data 
 
-            np.savez(f'{file}point{point}', pol0 = first, pol1 = second, alt=alt, az=az, date = jd, missed = flops)
+            np.savez(f'{file}point{point}', data = data, pol0 = first, pol1 = second, alt=alt, az=az, date = jd, missed = flops)
         else:
             flops.update({point:[alt,az]})
             continue   
